@@ -682,18 +682,6 @@ class DurationPickerDialogState extends State<DurationPickerDialog> {
 
   late MaterialLocalizations localizations;
 
-  void _handleTimeChanged(Duration value) {
-    setState(() => _selectedDuration = value);
-  }
-
-  void _handleCancel() {
-    Navigator.pop(context);
-  }
-
-  void _handleOk() {
-    Navigator.pop(context, _selectedDuration);
-  }
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -707,7 +695,8 @@ class DurationPickerDialogState extends State<DurationPickerDialog> {
             aspectRatio: 1.0,
             child: _Dial(
               duration: _selectedDuration!,
-              onChanged: _handleTimeChanged,
+              onChanged: (Duration value) =>
+                  setState(() => _selectedDuration = value),
               baseUnit: widget.baseUnit,
             ),
           ),
@@ -717,11 +706,11 @@ class DurationPickerDialogState extends State<DurationPickerDialog> {
       /// Actions
       actions: <Widget>[
         TextButton(
-          onPressed: _handleCancel,
+          onPressed: () => Navigator.pop(context),
           child: Text(localizations.cancelButtonLabel),
         ),
         TextButton(
-          onPressed: _handleOk,
+          onPressed: () => Navigator.pop(context, _selectedDuration),
           child: Text(localizations.okButtonLabel),
         ),
       ],
@@ -767,9 +756,6 @@ class DurationPicker extends StatelessWidget {
   final BaseUnit baseUnit;
   final Duration? upperBound;
   final Duration? lowerBound;
-  @Deprecated('This value was never used')
-  final double? snapToMins;
-
   final double? width;
   final double? height;
 
@@ -782,7 +768,6 @@ class DurationPicker extends StatelessWidget {
     this.lowerBound,
     this.width,
     this.height,
-    @Deprecated('This value was never used') this.snapToMins,
   }) : super(key: key);
 
   @override
