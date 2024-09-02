@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 const Duration _kDialAnimateDuration = Duration(milliseconds: 200);
 
 const double _kDurationPickerWidthPortrait = 328.0;
-const double _kDurationPickerWidthLandscape = 512.0;
+// const double _kDurationPickerWidthLandscape = 512.0;
 
 const double _kDurationPickerHeightPortrait = 380.0;
-const double _kDurationPickerHeightLandscape = 304.0;
+// const double _kDurationPickerHeightLandscape = 304.0;
 
 const double _kTwoPi = 2 * math.pi; // 360 degrees in radians
 const double _kPiByTwo = math.pi / 2; // 90 degrees in radians
@@ -650,7 +650,6 @@ class DurationPickerDialog extends StatefulWidget {
     Key? key,
     required this.initialTime,
     this.baseUnit = BaseUnit.minute,
-    this.decoration,
     this.upperBound,
     this.lowerBound,
   }) : super(key: key);
@@ -658,7 +657,6 @@ class DurationPickerDialog extends StatefulWidget {
   /// The duration initially selected when the dialog is shown.
   final Duration initialTime;
   final BaseUnit baseUnit;
-  final BoxDecoration? decoration;
   final Duration? upperBound;
   final Duration? lowerBound;
 
@@ -685,9 +683,7 @@ class DurationPickerDialogState extends State<DurationPickerDialog> {
   late MaterialLocalizations localizations;
 
   void _handleTimeChanged(Duration value) {
-    setState(() {
-      _selectedDuration = value;
-    });
+    setState(() => _selectedDuration = value);
   }
 
   void _handleCancel() {
@@ -700,99 +696,36 @@ class DurationPickerDialogState extends State<DurationPickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    assert(debugCheckHasMediaQuery(context));
-    final theme = Theme.of(context);
-    final boxDecoration =
-        widget.decoration ?? BoxDecoration(color: theme.dialogBackgroundColor);
-    final Widget picker = Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: AspectRatio(
-        aspectRatio: 1.0,
-        child: _Dial(
-          duration: _selectedDuration!,
-          onChanged: _handleTimeChanged,
-          baseUnit: widget.baseUnit,
+    return AlertDialog(
+      /// Picker
+      content: SizedBox(
+        width: _kDurationPickerWidthPortrait,
+        height: _kDurationPickerHeightPortrait,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: AspectRatio(
+            aspectRatio: 1.0,
+            child: _Dial(
+              duration: _selectedDuration!,
+              onChanged: _handleTimeChanged,
+              baseUnit: widget.baseUnit,
+            ),
+          ),
         ),
       ),
+
+      /// Actions
+      actions: <Widget>[
+        TextButton(
+          onPressed: _handleCancel,
+          child: Text(localizations.cancelButtonLabel),
+        ),
+        TextButton(
+          onPressed: _handleOk,
+          child: Text(localizations.okButtonLabel),
+        ),
+      ],
     );
-
-    final Widget actions = ButtonBarTheme(
-      data: ButtonBarTheme.of(context),
-      child: ButtonBar(
-        children: <Widget>[
-          TextButton(
-            onPressed: _handleCancel,
-            child: Text(localizations.cancelButtonLabel),
-          ),
-          TextButton(
-            onPressed: _handleOk,
-            child: Text(localizations.okButtonLabel),
-          ),
-        ],
-      ),
-    );
-
-    final dialog = Dialog(
-      child: OrientationBuilder(
-        builder: (BuildContext context, Orientation orientation) {
-          final Widget pickerAndActions = DecoratedBox(
-            decoration: boxDecoration,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Expanded(
-                  child: picker,
-                ), // picker grows and shrinks with the available space
-                actions,
-              ],
-            ),
-          );
-
-          switch (orientation) {
-            case Orientation.portrait:
-              return SizedBox(
-                width: _kDurationPickerWidthPortrait,
-                height: _kDurationPickerHeightPortrait,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Expanded(
-                      child: pickerAndActions,
-                    ),
-                  ],
-                ),
-              );
-            case Orientation.landscape:
-              return SizedBox(
-                width: _kDurationPickerWidthLandscape,
-                height: _kDurationPickerHeightLandscape,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Flexible(
-                      child: pickerAndActions,
-                    ),
-                  ],
-                ),
-              );
-          }
-        },
-      ),
-    );
-
-    return Theme(
-      data: theme.copyWith(
-        dialogBackgroundColor: Colors.transparent,
-      ),
-      child: dialog,
-    );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }
 
@@ -813,7 +746,6 @@ Future<Duration?> showDurationPicker({
   required BuildContext context,
   required Duration initialTime,
   BaseUnit baseUnit = BaseUnit.minute,
-  BoxDecoration? decoration,
   Duration? upperBound,
   Duration? lowerBound,
 }) async {
@@ -822,7 +754,6 @@ Future<Duration?> showDurationPicker({
     builder: (BuildContext context) => DurationPickerDialog(
       initialTime: initialTime,
       baseUnit: baseUnit,
-      decoration: decoration,
       upperBound: upperBound,
       lowerBound: lowerBound,
     ),
